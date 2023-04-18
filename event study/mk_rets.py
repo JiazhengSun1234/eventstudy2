@@ -1,5 +1,4 @@
 """ mk_rets.py
-
 Utilities to calculate stock and market returns
 """
 
@@ -9,14 +8,12 @@ import event_study.config as cfg
 
 
 # Function to read prices and calculate returns
-def mk_ret_df(tic): 
+def mk_ret_df(tic):
     """ Calculates return variables for the ticker `tic`
-
     Parameters
     ----------
     tic : str
         Ticker
-
     Returns
     -------
     dataframe
@@ -27,7 +24,6 @@ def mk_ret_df(tic):
                 Daily stock returns for this ticker `tic`
             mkt: float
                 Daily market returns
-
     Notes
     -----
     This function perform the following operations:
@@ -35,7 +31,6 @@ def mk_ret_df(tic):
     2. Read the CSV file into a data frame
     3. Calculate stock returns returns
     4. Join market returns
-
     """
 
 
@@ -74,4 +69,5 @@ if __name__ == "__main__":
     df = mk_ret_df(tic)
     print(df)
     df.info()
+Footer
 

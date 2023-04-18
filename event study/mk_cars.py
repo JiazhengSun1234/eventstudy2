@@ -1,5 +1,4 @@
 """ mk_cars.py
-
 Utilities to create CARs for the events in our study
 """
 
@@ -14,7 +13,6 @@ def mk_cars_df(ret_df, event_df):
     (`event_df`) and the corresponding data frame with stock and market
     returns (`ret_df`), calculate the Cumulative Abnormal Return over the
     two-day window surrounding each event.
-
     Parameters
     ----------
     ret_df : pandas data frame
@@ -25,7 +23,6 @@ def mk_cars_df(ret_df, event_df):
             mkt : float
                 Daily market return
         The index is a DatetimeIndex corresponding to each trading day
-
     event_df : pandas data frame
         Dataframe created by the function `mk_events.mk_event_df`. This data
         frame includes all events in our study (uniquely identified by an
@@ -38,7 +35,6 @@ def mk_cars_df(ret_df, event_df):
             event_type : str
                 A string identifying the event as either an upgrade
                 ("upgrade") or downgrade ("downgrade")
-
     Returns
     -------
     Pandas data frame
@@ -46,11 +42,9 @@ def mk_cars_df(ret_df, event_df):
         column containing the CARs:
             car : float
                 The CAR for the two-day window surrounding the event
-
     Notes
     -----
     This function will apply the `mk_cars.calc_car` function to each row of the `event_df`
-
     """
     cars = event_df.apply(calc_car, axis=1, ret_df=ret_df)
     event_df.loc[:, 'car'] = cars
@@ -62,47 +56,39 @@ def expand_dates(ser, window=2):
     function above, return a data frame with the dates for the `window` days
     surrounding the event_date by performing the following operations (in this
     order)
-
-    1. Create a DF with one row for each day in the window , 
+    1. Create a DF with one row for each day in the window ,
         where each row represents a copy of the series in `row`
     2. Create a column called "event_date", which the datetime representation
         of the dates in 'event_date'
     3. Create a column called "event_time" with values from -`window` to `window`
     4. Create another column called "ret_date" with the **datetime**
       representation of the relevant calendar date. The calendar date will be
-      the date in "event_date" plus the value from "event_time". 
-
+      the date in "event_date" plus the value from "event_time".
     Parameters
     ----------
     ser : series
        Series corresponding to a row from the data frame produced by
         `mk_event_df`
-
     Returns
     -------
-    df 
+    df
         A Pandas data frame with the following structure:
-
         - df.index : Integers representing the ID of this event, that is,
             uniquely identifying a unique combination of values (<event_date>,
             <firm>). The index should start at 1.
-
         - df.columns : See Notes section below
-
     Notes
     -----
-
     For instance, suppose window = 2 and consider the following row (an event):
- 
- 
+
+
      | event_id | firm       | event_date  |
      |----------+------------+------------|
      | 1        | Wunderlich | 2012-02-16 |
- 
 
      This function would produce the following data:
- 
- 
+
+
      | firm       | event_date | event_time | ret_date   |
      |------------+------------+------------+------------|
      | Wunderlich | 2012-02-16 | -2         | 2012-02-14 |
@@ -110,20 +96,16 @@ def expand_dates(ser, window=2):
      | Wunderlich | 2012-02-16 | 0          | 2012-02-16 |
      | Wunderlich | 2012-02-16 | 1          | 2012-02-17 |
      | Wunderlich | 2012-02-16 | 2          | 2012-02-18 |
-
      which should be stored in a data frame with the following characteristics:
-
      ----------------------------------------------
      Data columns (total 4 columns):
-      #   Column      Non-Null Count  Dtype         
-     ---  ------      --------------  -----         
-      0   firm        5 non-null      object        
+      #   Column      Non-Null Count  Dtype
+     ---  ------      --------------  -----
+      0   firm        5 non-null      object
       1   event_date  5 non-null      datetime64[ns]
-      2   event_time  5 non-null      int64         
+      2   event_time  5 non-null      int64
       3   ret_date    5 non-null      datetime64[ns]
      ----------------------------------------------
-
-
     """
     # Create a list of series
     row_lst = [ser] * (2*window+1)
@@ -153,45 +135,40 @@ def calc_car(ser, ret_df, window=2):
     above, compute the cumulative abnormal returns for the event window
     surrounding the event_date by performing the following operations (in this
     order)
-
     1. Expand the dates using the `expand_dates` function
     2. Join returns in `ret_df`
     3. Sum the abnormal returns to compute the CAR
-
     Parameters
     ----------
     ser : series
        Series corresponding to a row from the data frame produced by
         `mk_event_df`
-    
-    ret_df : data frame
-        A data frame with stock and market returns 
 
+    ret_df : data frame
+        A data frame with stock and market returns
     Returns
     -------
     float
         Cumulative abnormal return for this row
-
-
     """
 
 
     # --------------------------------------------------------
     #   Step 4.1: Expand dates and set 'ret_date' as the new index
-    # -------------------------------------------------------- 
+    # --------------------------------------------------------
     dates = expand_dates(ser, window=window)
     dates.set_index('ret_date', inplace=True)
-    # -------------------------------------------------------- 
+    # --------------------------------------------------------
     #   Step 4.2: Join stock and market returns returns
-    # -------------------------------------------------------- 
+    # --------------------------------------------------------
     df = dates.join(ret_df, how='inner')
     # --------------------------------------------------------
     #   Step 4.3: Compute abnormal returns
     # --------------------------------------------------------
     df.loc[:, 'aret'] = df.loc[:, 'ret'] - df.loc[:, 'mkt']
-    # -------------------------------------------------------- 
+    # --------------------------------------------------------
     #   Step 4.4: Sum abnormal returns
-    # -------------------------------------------------------- 
+    # --------------------------------------------------------
     # If df is empty, return np.nan
     if len(df) == 0:
         return np.nan
@@ -205,16 +182,12 @@ def _test_mk_cars_df(sample_only=False):
     ----------
     sample_only : bool, optional
         If True, will use a single event from the `event_df`
-
     Notes
     -----
     if `sample_only` is True, the event df will become:
-
         | event_id | event_date | event_type | car       |
         |----------|------------|------------|-----------|
         | 1        | 2020-09-23 | upgrade    | $CAR_{1}$ |
-
-
     """
     from event_study import mk_rets, mk_events
 
@@ -262,4 +235,3 @@ def _test_mk_cars_df(sample_only=False):
 if __name__ == "__main__":
     sample_only = True
     _test_mk_cars_df(sample_only)
-

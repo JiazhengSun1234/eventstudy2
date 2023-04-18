@@ -1,6 +1,6 @@
-""" config.py
 
-Configuration file for the event_study package         
+""" config.py
+Configuration file for the event_study package
 """
 import os
 
@@ -22,12 +22,11 @@ END = '2020-12-31'
 def csv_locs(tic):
     """ Returns a dictionary with the location of the source CSV files for a
     given ticker `tic`.
-
     Parameters
     ----------
     tic : str
         Ticker
-   
+
     Returns
     -------
     dict
@@ -44,18 +43,16 @@ def csv_locs(tic):
             }
 
 
-# -------------------------------------------------------- 
+# --------------------------------------------------------
 #   Aux function to process col names
 # --------------------------------------------------------
 def standardise_colnames(df):
-    """ Renames the columns in `df` so that 
+    """ Renames the columns in `df` so that
     - Names are lower case
     - Spaces are replaced with '_'
-
     Parameters
     ----------
     df : dataframe
-
     Notes
     -----
     - If column with the standardised name already exists, the new column will
@@ -72,7 +69,7 @@ def standardise_colnames(df):
         # 2) column name is not properly formatted but exists in the dataframe
         #   => Include '_' prefix
         # 3) Else: return formatted name
-        if new_name == colname: 
+        if new_name == colname:
             # Returns original column
             return colname
         elif new_name in cols:
@@ -80,5 +77,6 @@ def standardise_colnames(df):
         else:
             return new_name
     return df.rename(columns=_parse_name)
+
 
 
